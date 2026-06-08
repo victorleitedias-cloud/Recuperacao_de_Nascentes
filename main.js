@@ -1,61 +1,90 @@
-/* --- script.js --- */
+/* 
+ * AGRINHO 2026 - PROGRAMA DE VALORIZAÇÃO DE NASCENTES
+ * Arquivo de JavaScript - Lógica do Jogo e Interatividade
+ */
 
-// Variáveis de Estado
-let qualidade = 0;
+// ============================================
+// VARIÁVEIS DO JOGO
+// ============================================
 
-// Elementos do DOM
-const springDisplay = document.getElementById('springDisplay');
-const progressBar = document.getElementById('progressBar');
-const feedback = document.getElementById('msgFeedback');
+let health = 0;  // Nível de saúde da nascente (0 a 100)
+const maxHealth = 100;
 
-// Função Principal
-function realizarAcao(acao) {
-    if (qualidade >= 100) {
-        feedback.innerText = "A nascente está completamente restaurada! Ótimo trabalho! ☀️💧";
-        return;
+// Elementos do DOM (HTML)
+const springIcon = document.getElementById('springIcon');
+const progressFill = document.getElementById('progressFill');
+const statusText = document.getElementById('statusText');
+const message = document.getElementById('message');
+const btnFinal = document.getElementById('btnFinal');
+const finalMessage = document.getElementById('finalMessage');
+
+// ============================================
+// FUNÇÕES DO JOGO
+// ============================================
+
+/**
+ * Função para plantar árvore
+ * Aumenta a saúde da nascente em 15%
+ */
+function plantTree() {
+    if (health < maxHealth) {
+        health += 15;
+        message.innerText = "🌳 Árvore plantada! A terra agora absorve melhor a água da chuva.";
+        updateGame();
     }
-
-    // Lógica de incremento de qualidade
-    if (acao === 'plantar') {
-        qualidade += 15;
-        feedback.innerText = "🌱 As raízes estão crescendo e filtrando a água!";
-        atualizarCores();
-    } else if (acao === 'limpar') {
-        qualidade += 20;
-        feedback.innerText = "🧹 Lixo removido! A água está mais transparente.";
-        atualizarCores();
-    } else if (acao === 'proteger') {
-        qualidade += 10;
-        feedback.innerText = "🪨 Barreira criada contra animais e químicos.";
-        atualizarCores();
-    }
-
-    // Atualizar Visualização
-    atualizarInterface();
 }
 
-// Atualiza a_interface (texto e barra)
-function atualizarInterface() {
-    // Limita a 100%
-    if (qualidade > 100) qualidade = 100;
+/**
+ * Função para cercar a nascente
+ * Aumenta a saúde da nascente em 15%
+ */
+function fenceSpring() {
+    if (health < maxHealth) {
+        health += 15;
+        message.innerText = "🚧 Cerca construída! O gado não consegue mais sujar a água.";
+        updateGame();
+    }
+}
 
-    // Atualiza Texto
-    springDisplay.innerText = `Qualidade da Água: ${qualidade}%`;
+/**
+ * Função para limpar a água
+ * Aumenta a saúde da nascente em 20%
+ */
+function cleanWater() {
+    if (health < maxHealth) {
+        health += 20;
+        message.innerText = "✨ Água limpa! Os peixes e sapos estão voltando para a nascente.";
+        updateGame();
+    }
+}
+
+/**
+ * Função para atualizar o jogo
+ * Muda os ícones e textos conforme a saúde
+ */
+function updateGame() {
+    // Limita o máximo em 100
+    if (health > maxHealth) {
+        health = maxHealth;
+    }
     
-    // Atualiza Barra de Progresso
-    progressBar.style.width = `${qualidade}%`;
-}
-
-// Atualiza as cores conforme a qualidade
-function atualizarCores() {
-    // Lógica para mudar a cor da "água" (quadrado cinza)
-    // De Cinza (sujo) -> Marrom -> Amarelo -> Azul (limpo)
+    // Atualiza a barra de progresso
+    progressFill.style.width = health + "%";
+    progressFill.innerText = health + "%";
     
-    if (qualidade < 30) {
-        springDisplay.style.background = "#8d6e63"; // Marrom sujo
-    } else if (qualidade < 60) {
-        springDisplay.style.background = "#f39c12"; // Amarelo/lodo
-    } else {
-        springDisplay.style.background = "#3498db"; // Azul limpo
-    }
-}
+    // Atualiza o ícone e texto conforme o nível
+    if (health < 25) {
+        // Nível muito baixo - perigosamente poluída
+        springIcon.innerText = "💧🐢"; // Tartaruga suja
+        statusText.innerText = "Nascente POLUÍDA - Perigo!";
+        statusText.style.color = "#c0392b"; // Vermelho
+    } 
+    else if (health < 50) {
+        // Nível baixo - em recuperação
+        springIcon.innerText = "💧🐟"; // Peixe voltando
+        statusText.innerText = "Nascente em RECUPERAÇÃO";
+        statusText.style.color = "#e67e22"; // Laranja
+    } 
+    else if (health < 100) {
+        // Nível médio - quase limpa
+        springIcon.innerText = "💧🦆"; //

@@ -1,396 +1,152 @@
-<think>
-O usuário está pedindo para gerar um arquivo HTML que integre o CSS e o JS fornecidos.
-Eu tenho três partes do código:
-1.  CSS (`style.css`)
-2.  JS (`script.js`)
-3.  Uma descrição sobre "geral o html atraves do css e js" (gerar o html através do css e js).
-
-Objetivo: Criar um arquivo HTML completo (index.html) que inclua a estrutura HTML, incorporada a tag `<style>` com o CSS e incorporada a tag `<script>` com o JS.
-
-Análise do conteúdo:
-- O CSS usa variáveis CSS (`:root`), define estilos para header, container, sections, cards, uma caixa de simulação (`simulation-box`), uma mola visual (`spring-visual`), botões e uma barra de progresso. Parece ser uma página educativa sobre ecologia/nascente.
-- O JS define variáveis de estado (`qualidade`), busca elementos DOM e tem funções para lidar com ações de usuário (`realizarAcao`, `atualizarInterface`, `atualizarCores`).
-
-Estrutura HTML necessária:
-- `<!DOCTYPE html>`
-- `<html>`, `<head>`, `<body>`
-- `<header>` com `<h1>` e `<p>` (do CSS).
-- `<div class="container">`
-- `<section>` introdutória (textos).
-- `<section>` com a grade de informações (`.info-grid`).
-- `<section>` principal que é a área de simulação (`.simulation-box`).
-    - Dentro da simulação: uma `div` para a visualização (`spring-visual` ou `springDisplay` conforme o ID no JS).
-    - Controles (`.controls`) com botões.
-    - Barra de progresso (`.progress-container` -> `.progress-bar`).
-    - Mensagem de feedback (`#msgFeedback`).
-- `<footer>`
-- `<script>` no final do body.
-
-Conferindo IDs e Classes no JS/HTML:
-- JS: `document.getElementById('springDisplay')`. Preciso de uma div com ID `springDisplay`.
-- JS: `document.getElementById('progressBar')`. Preciso de uma div com ID `progressBar`.
-- JS: `document.getElementById('msgFeedback')`. Preciso de um elemento com ID `msgFeedback`.
-
-Conferindo o CSS:
-- `header h1`, `header p`.
-- `.info-grid` com `.card`.
-- `.simulation-box`.
-- `.spring-visual` (provavelmente o ID no JS referencia isso ou está dentro dele? O JS busca `springDisplay`, que no CSS é `.spring-visual`. Eu devo atribuir o ID `springVisual` ao elemento, mas o JS procura por `springDisplay`. Deixa eu checar o JS novamente.
-- JS: `const springDisplay = document.getElementById('springDisplay');`. Okay, preciso criar um ID `springDisplay` no HTML. No CSS, a classe é `.spring-visual`. Vou usar o ID no elemento HTML.
-
-Planejamento do HTML:
-1.  Header com título "Projeto Nascente Viva".
-2.  Seção "O Problema": Texto sobre poluição.
-3.  Seção "Ações de Proteção": Grid com 3 cards (Plantar, Limpar, Proteger).
-4.  Seção "Simulação":
-    - Texto explicativo.
-    - Uma caixa (`#springVisual` ou `#springDisplay` para atender ao JS). Vou usr `#springVisual` para coincidir com a classe visual e `#springDisplay` no ID? Não, melhor seguir o JS. O JS procura por `id="springDisplay"`. O CSS style para `.spring-visual` deve ser aplicado a esse elemento.
-    - Botões com `onclick="realizarAcao('plantar')"`, etc.
-    - Barra de progresso.
-    - ID `msgFeedback`.
-
-Integração:
-Vou colocar o CSS dentro de `<style>` e o JS dentro de `<script>`.
-
-Parece que o usuário quer apenas o HTML resultante. Vou gerar o código completo.
-
-Passos detalhados:
-1.  **Estrutura HTML**: Define o esqueleto.
-2.  **Head**: Inclui o CSS dentro da tag `<style>`. Note que o CSS fornecido usa classes como `.icon`, `.btn-plant`, etc. Preciso garantir que o HTML tenha amarkup compatível.
-3.  **Body**:
-    *   **Header**: Título e subtítulo.
-    *   **Intro Section**: Texto geral.
-    *   **Info Section**: Grid com 3 cards (plantas, água, terra).
-    *   **Simulation Section**:
-        *   `#springVisual` (styled as `.spring-visual`).
-        *   Botões (`.btn-plant`, etc) com event listeners.
-        *   Progress bar.
-        *   Feedback text.
-4.  **Script**: O JS fornecido precisa ser incluído.
-
-Ajuste fino:
-O JS usa `document.getElementById('springDisplay')`, mas a classe CSS é `.spring-visual`. Vou aplicar ambos ao elemento: `<div id="springDisplay" class="spring-visual">`. Assim o JSacha o ID e o CSS pega a classe (ou posso renomear a classe no CSS para ID, mas é mais seguro manter o padrão e usar o ID no elemento).
-O JS também espera `onclick` chamando a função `realizarAcao`. Vou adicionar isso aos botões.
-
-Resposta final: Um arquivo único index.html.
-</think> o código HTML completo, que incorpora o CSS e o JavaScript fornecidos para criar a página funcional.
-
-```html
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto Nascente Viva</title>
-    <style>
-        /* --- style.css --- */
-        :root {
-            --primary-green: #2ecc71;
-            --dark-green: #27ae60;
-            --water-blue: #3498db;
-            --sky-blue: #85c1e9;
-            --earth-brown: #795548;
-            --light-bg: #f4f6f7;
-            --text-color: #2c3e50;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--light-bg);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        header {
-            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
-            color: white;
-            padding: 2rem 1rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        header p {
-            font-size: 1.2rem;
-            font-weight: 300;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Sections */
-        section {
-            background: white;
-            margin-bottom: 2rem;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        h2 {
-            color: var(--earth-brown);
-            border-bottom: 3px solid var(--primary-green);
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        /* Cards de Informação */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            border: 1px solid #eee;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        /* Área de Simulação (Interativa) */
-        .simulation-box {
-            border: 2px dashed var(--earth-brown);
-            background: #e8f8f5;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        #springDisplay {
-            width: 100%;
-            height: 150px;
-            background: #a0a0a0; /* Cor inicial (poluída) */
-            border-radius: 0 0 50px 50px;
-            margin: 20px auto;
-            position: relative;
-            overflow: hidden;
-            transition: background 1s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            font-size: 1rem;
-        }
-
-        .btn-plant { background-color: var(--primary-green); color: white; }
-        .btn-plant:hover { background-color: var(--dark-green); }
-
-        .btn-clean { background-color: var(--water-blue); color: white; }
-        .btn-clean:hover { background-color: #2980b9; }
-
-        .btn-protect { background-color: var(--earth-brown); color: white; }
-        .btn-protect:hover { background-color: #5d4037; }
-
-        /* Barra de Progresso */
-        .progress-container {
-            width: 100%;
-            background-color: #ddd;
-            border-radius: 10px;
-            margin: 15px 0;
-            height: 25px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0%; /* Começa vazio */
-            background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71);
-            transition: width 0.5s ease;
-        }
-
-        #msgFeedback {
-            min-height: 1.6em;
-            font-weight: bold;
-            color: var(--text-color);
-            margin-bottom: 10px;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: var(--text-color);
-            color: white;
-            margin-top: 2rem;
-        }
-    </style>
+    <title>Agrinho 2026 - Valorização de Nascentes</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- CABEÇALHO -->
     <header>
-        <h1>Projeto Nascente Viva</h1>
-        <p>Restaurando a vida em nosso ecossistema</p>
+        <div class="logo">🌱💧</div>
+        <h1>AGRINHO 2026</h1>
+        <p>TEMA: VALORIZAÇÃO DE NASCENTES</p>
     </header>
 
     <div class="container">
         
-        <!-- Seção Educativa -->
+        <!-- SEÇÃO 1: O QUE É UMA NASCENTE -->
         <section>
-            <h2>Conoce o Problema</h2>
-            <p>As nascentes são a origem da vida aquática. Porém,-poluição, desmatamento e descarte irregular de lixo têm comprometido a qualidade da água. Ajude a restaurá-la!</p>
+            <h2>💧 O que é uma Nascente?</h2>
+            <p>Uma nascente (ou fonte) é o lugar onde a água subterrânea (debaixo da terra) aflora (aparece) na superfície. É o início de todos os rios! Sem as nascentes, os rios secam e não temos água para beber, para os animais e para as plantações.</p>
+            <br>
+            <p class="destaque">
+                <strong>💡 Você sabia?</strong> No Paraná, temos milhares de nascentes que fornecem água para milhões de pessoas!
+            </p>
         </section>
 
-        <!-- Seção de Cards -->
+        <!-- SEÇÃO 2: PROBLEMAS -->
         <section>
-            <h2>Ações de Proteção</h2>
-            <div class="info-grid">
+            <h2>⚠️ Por que as Nascentes estão Secando?</h2>
+            <div class="cards">
                 <div class="card">
-                    <span class="icon">🌱</span>
-                    <h3>Plantar</h3>
-                    <p>Raízes filtram a água e evitam a erosão do solo.</p>
+                    <span class="icon">🚜</span>
+                    <h3>Gado na Água</h3>
+                    <p>O gado entra na nascente, pisoteia a terra e polui a água com esterco.</p>
                 </div>
                 <div class="card">
-                    <span class="icon">🧹</span>
-                    <h3>Limpar</h3>
-                    <p>Remover o lixo é essencial para a saúde da água.</p>
+                    <span class="icon">🧪</span>
+                    <h3>Agrotóxicos</h3>
+                    <p>Os venenos usados nas lavouras infiltram no solo e contaminam a água.</p>
                 </div>
                 <div class="card">
-                    <span class="icon">🪨</span>
-                    <h3>Proteger</h3>
-                    <p> Cercas evitam que animais pisem e contaminem a nascente.</p>
+                    <span class="icon">🌳</span>
+                    <h3>Desmatamento</h3>
+                    <p>Sem árvores, a chuva não é absorvida e a nascente seca mais rápido.</p>
+                </div>
+                <div class="card">
+                    <span class="icon">🏗️</span>
+                    <h3>Construções</h3>
+                    <p>Casas e estradas impermeabilizam o solo, impedindo a água de passar.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Área Interativa -->
-        <section class="simulation-box">
-            <h2>Simulador de Qualidade da Água</h2>
-            <p>Clique nas ações abaixo para melhorar a nascente:</p>
-            
-            <!-- Elemento Visual -->
-            <div id="springDisplay">Qualidade da Água: 0%</div>
-            
-            <!-- Mensagem de Feedback -->
-            <div id="msgFeedback">A nascente precisa de sua ajuda!</div>
-
-            <!-- Controles -->
-            <div class="controls">
-                <button class="btn-plant" onclick="realizarAcao('plantar')">🌱 Plantar Vegetais</button>
-                <button class="btn-clean" onclick="realizarAcao('limpar')">🧹 Limpar Lixo</button>
-                <button class="btn-protect" onclick="realizarAcao('proteger')">🪨 Proteger Área</button>
+        <!-- SEÇÃO 3: SOLUÇÕES -->
+        <section>
+            <h2>✅ Como Proteger as Nascentes?</h2>
+            <div class="cards">
+                <div class="card">
+                    <span class="icon">🌲</span>
+                    <h3>Plantio</h3>
+                    <p>Plantar árvores nativas ao redor (mata ciliar) protege a nascente.</p>
+                </div>
+                <div class="card">
+                    <span class="icon">🚧</span>
+                    <h3>Cerca</h3>
+                    <p>Cercar a nascente impede o gado de entrar e sujar a água.</p>
+                </div>
+                <div class="card">
+                    <span class="icon">🌿</span>
+                    <h3>Orgânico</h3>
+                    <p>Usar adubos naturais em vez de venenos protege a água.</p>
+                </div>
+                <div class="card">
+                    <span class="icon">📢</span>
+                    <h3>Conscientizar</h3>
+                    <p>Ensinar a comunidade sobre a importância de proteger as fontes.</p>
+                </div>
             </div>
+        </section>
 
-            <!-- Barra de Progresso -->
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
+        <!-- SEÇÃO 4: JOGO INTERATIVO -->
+        <section class="game-section">
+            <h2>🎮 Vamos Cuidar da Nascente!</h2>
+            <p>Ajude a recuperar a nascente poluída! Clique nos botões para plantar árvores e limpar a água.</p>
+            
+            <div class="game-area">
+                <div id="springIcon" class="spring-status">💧🐢</div>
+                
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill">0%</div>
+                </div>
+                
+                <h3 id="statusText">Nascente POLUÍDA - Perigo!</h3>
+                
+                <div class="buttons">
+                    <button class="btn-action" onclick="plantTree()">🌳 Plantar Árvore</button>
+                    <button class="btn-action" onclick="fenceSpring()">🚧 Cercar a Nascente</button>
+                    <button class="btn-action" onclick="cleanWater()">✨ Limpar a Água</button>
+                    <button class="btn-reset" onclick="resetGame()">🔄 Recomeçar</button>
+                </div>
+                
+                <div id="message" class="message">Clique em uma ação para começar!</div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 5: COMPROMISSO -->
+        <section class="commitment">
+            <h2>📜 Meu Compromisso como Guardião da Água</h2>
+            <p>Eu me comprometo a fazer a minha parte para proteger as nascentes:</p>
+            
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" onchange="checkCommitments()">
+                    Vou plantar pelo menos uma árvore nativa este ano.
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" onchange="checkCommitments()">
+                    Vou conscientizar minha família sobre a importância da água.
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" onchange="checkCommitments()">
+                    Não jogarei lixo nas fontes de água.
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" onchange="checkCommitments()">
+                    Vou cuidar das nascentes da minha comunidade.
+                </label>
+            </div>
+            
+            <button id="btnFinal" class="btn-final" disabled onclick="finishProgram()">
+                🌟 Finalizar Programa Agrinho 2026
+            </button>
+            
+            <div id="finalMessage">
+                <h2>🎉 PARABÉNS! Você agora é um Guardião da Água!</h2>
+                <p>Ajude a spread esta mensagem. Preserve as nascentes!</p>
             </div>
         </section>
 
     </div>
 
     <footer>
-        <p>&copy; 2023 Projeto Nascente Viva - Educacional</p>
+        <p>Agrinho 2026 - Programa de Educação Ambiental</p>
+        <p>Escola: ___________________ | Aluno: ___________________</p>
     </footer>
 
-    <script>
-        // Variáveis de Estado
-        let qualidade = 0;
-
-        // Elementos do DOM
-        const springDisplay = document.getElementById('springDisplay');
-        const progressBar = document.getElementById('progressBar');
-        const feedback = document.getElementById('msgFeedback');
-
-        // Função Principal
-        function realizarAcao(acao) {
-            if (qualidade >= 100) {
-                feedback.innerText = "A nascente está completamente restaurada! Ótimo trabalho! ☀️💧";
-                return;
-            }
-
-            // Lógica de incremento de qualidade
-            if (acao === 'plantar') {
-                qualidade += 15;
-                feedback.innerText = "🌱 As raízes estão crescendo e filtrando a água!";
-                atualizarCores();
-            } else if (acao === 'limpar') {
-                qualidade += 20;
-                feedback.innerText = "🧹 Lixo removido! A água está mais transparente.";
-                atualizarCores();
-            } else if (acao === 'proteger') {
-                qualidade += 10;
-                feedback.innerText = "🪨 Barreira criada contra animais e químicos.";
-                atualizarCores();
-            }
-
-            // Atualizar Visualização
-            atualizarInterface();
-        }
-
-        // Atualiza a_interface (texto e barra)
-        function atualizarInterface() {
-            // Limita a 100%
-            if (qualidade > 100) qualidade = 100;
-
-            // Atualiza Texto
-            springDisplay.innerText = `Qualidade da Água: ${qualidade}%`;
-            
-            // Atualiza Barra de Progresso
-            progressBar.style.width = `${qualidade}%`;
-        }
-
-        // Atualiza as cores conforme a qualidade
-        function atualizarCores() {
-            // Lógica para mudar a cor da "água" (quadrado cinza)
-            // De Cinza (sujo) -> Marrom -> Amarelo -> Azul (limpo)
-            
-            if (qualidade < 30) {
-                springDisplay.style.background = "#8d6e63"; // Marrom sujo
-            } else if (qualidade < 60) {
-                springDisplay.style.background = "#f39c12"; // Amarelo/lodo
-            } else {
-                springDisplay.style.background = "#3498db"; // Azul limpo
-            }
-        }
-    </script>
-
+    <script src="script.js"></script>
 </body>
 </html>
-```
